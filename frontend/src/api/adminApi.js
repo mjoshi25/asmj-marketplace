@@ -1,0 +1,20 @@
+import http from "./http";
+export const getAdminDashboard=()=>http.get("/admin/dashboard");
+export const getAdminUsers=()=>http.get("/admin/users");
+export const changeUserStatus=(id,status)=>http.put(`/admin/users/${id}/status`,{status});
+export const addUserRole=(id,role)=>http.put(`/admin/users/${id}/roles/${role}`);
+export const removeUserRole=(id,role)=>http.delete(`/admin/users/${id}/roles/${role}`);
+export const getApprovals=()=>http.get("/admin/approvals");
+export const getPendingVendors=()=>http.get("/admin/vendors/pending");
+export const getVendors=()=>http.get("/admin/vendors");
+export const getApprovalDetails=id=>http.get(`/admin/approvals/${id}/details`);
+export const approvePost=id=>http.put(`/admin/posts/${id}/approve`);
+export const rejectPost=(id,comments="")=>http.put(`/admin/posts/${id}/reject`,{comments});
+export const approveVendor=id=>http.put(`/admin/vendors/${id}/approve`);
+export const rejectVendor=(id,comments="")=>http.put(`/admin/vendors/${id}/reject`,{comments});
+export const getAuditLogs=()=>http.get("/admin/audit-logs");
+export const getReviews=()=>http.get("/admin/reviews");
+export const deleteReview=id=>http.delete(`/admin/reviews/${id}`);
+export const getAnalytics=()=>http.get("/analytics/admin");
+
+export const getVendorApprovalDetails=id=>http.get(`/admin/vendors/${id}/details`);

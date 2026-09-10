@@ -1,0 +1,5 @@
+import {CheckCircle2,Clock3} from "lucide-react";
+export default function StatusTimeline({history=[],current}){
+ const rows=Array.isArray(history)&&history.length?history:[{status:current,note:"Current status",changedAt:null}];
+ return <div className="relative ml-2">{rows.map((h,i)=><div key={`${h.status}-${i}`} className="relative flex gap-3 pb-5 last:pb-0"><div className="z-10 mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-950 text-white"><CheckCircle2 size={14}/></div>{i<rows.length-1&&<div className="absolute left-3.5 top-7 h-[calc(100%-14px)] w-px bg-slate-200"/>}<div className="min-w-0 flex-1 rounded-xl bg-slate-50 p-3"><div className="flex flex-wrap items-center justify-between gap-2"><span className="text-sm font-black uppercase tracking-wide text-slate-800">{h.status}</span><span className="text-xs text-slate-400">{h.changedAt?new Date(h.changedAt).toLocaleString("en-IN"):"—"}</span></div>{h.note&&<p className="mt-1 text-sm text-slate-500">{h.note}</p>}</div></div>)}</div>
+}

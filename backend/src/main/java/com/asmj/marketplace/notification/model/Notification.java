@@ -1,0 +1,1 @@
+package com.asmj.marketplace.notification.model;import lombok.*;import org.springframework.data.annotation.Id;import org.springframework.data.mongodb.core.mapping.Document;import java.time.Instant;@Data@Builder@NoArgsConstructor@AllArgsConstructor@Document("notifications")public class Notification{@Id String id;String userId,title,message,type;boolean read;Instant createdAt;}

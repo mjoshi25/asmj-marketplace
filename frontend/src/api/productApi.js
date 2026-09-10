@@ -1,0 +1,16 @@
+import http from "./http";
+export const getProducts=()=>http.get("/products");
+export const getVendorProducts=()=>http.get("/products/vendor");
+export const saveProduct=(p,id)=>id?http.put(`/products/vendor/${id}`,p):http.post("/products/vendor",p);
+export const getCart=()=>http.get("/products/cart");
+export const addToCart=p=>http.post("/products/cart",p);
+export const removeFromCart=(productId,variantId)=>http.delete("/products/cart",{params:{productId,variantId}});
+export const checkout=p=>http.post("/products/checkout",p);
+export const getMyOrders=()=>http.get("/products/orders/my");
+export const getVendorOrders=()=>http.get("/products/orders/vendor");
+export const updateProductOrderStatus=(id,p)=>http.put(`/products/orders/${id}/status`,p);
+export const adminProducts=()=>http.get("/admin/products");
+export const approveProduct=(id,approved)=>http.put(`/admin/products/${id}/approval`,null,{params:{approved}});
+export const adminProductOrders=()=>http.get("/admin/products/orders");
+export const adminCoupons=()=>http.get("/admin/products/coupons");
+export const saveCoupon=p=>http.post("/admin/products/coupons",p);

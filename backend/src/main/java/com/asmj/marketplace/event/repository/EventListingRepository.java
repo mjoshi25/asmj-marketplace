@@ -1,0 +1,2 @@
+package com.asmj.marketplace.event.repository; import com.asmj.marketplace.event.model.EventListing; import org.springframework.data.mongodb.repository.MongoRepository; import java.util.*;
+public interface EventListingRepository extends MongoRepository<EventListing,String>{ List<EventListing> findByApprovedTrueAndActiveTrueAndStatusOrderByEventDateAscStartTimeAsc(String status); List<EventListing> findByVendorIdOrderByEventDateDescStartTimeDesc(String vendorId); }

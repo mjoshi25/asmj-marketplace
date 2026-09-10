@@ -1,0 +1,1 @@
+package com.asmj.marketplace.category.repository; import com.asmj.marketplace.category.model.Category; import org.springframework.data.mongodb.repository.MongoRepository; import java.util.*; public interface CategoryRepository extends MongoRepository<Category,String>{List<Category> findByActiveTrue();Optional<Category> findBySlug(String slug);}

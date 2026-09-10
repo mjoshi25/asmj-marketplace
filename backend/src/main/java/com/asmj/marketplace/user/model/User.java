@@ -1,0 +1,3 @@
+package com.asmj.marketplace.user.model;
+import lombok.*; import org.springframework.data.annotation.Id; import org.springframework.data.mongodb.core.mapping.Document; import java.time.Instant; import java.util.*;
+@Data @Builder @NoArgsConstructor @AllArgsConstructor @Document("users") public class User { @Id private String id; private String name,email,mobile,password; @Builder.Default private Set<Role> roles=new HashSet<>(); private String profileImage; @Builder.Default private Status status=Status.ACTIVE; private Instant createdAt,updatedAt; public enum Role{USER,VENDOR,DRIVER,ADMIN} public enum Status{ACTIVE,INACTIVE,SUSPENDED} }

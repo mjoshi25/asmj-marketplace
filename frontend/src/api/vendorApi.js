@@ -1,0 +1,11 @@
+import http from "./http";
+export const getMyVendor = () => http.get("/vendors/me");
+export const createVendor = (payload) => http.post("/vendors", payload);
+export const updateMyVendor = (payload) => http.put("/vendors/me", payload);
+export const getMyListings = (params = {}) => http.get("/posts/vendor/mine", { params });
+export const getVendorEnquiries = () => http.get("/vendors/enquiries");
+export const getVendorAnalytics = () => http.get("/analytics/vendor");
+export const getVendorBookings = () => http.get("/bookings/vendor");
+export const updateBookingStatus = (id, status, note="") => http.put(`/bookings/vendor/${id}/status`, { status, note });
+export const getVendorApplications = () => http.get("/applications/vendor");
+export const updateApplicationStatus = (id, status, extra={}) => http.put(`/applications/vendor/${id}/status`, { status, ...extra });

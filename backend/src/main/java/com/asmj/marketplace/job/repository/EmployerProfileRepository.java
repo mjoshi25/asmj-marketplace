@@ -1,0 +1,1 @@
+package com.asmj.marketplace.job.repository; import com.asmj.marketplace.job.model.EmployerProfile; import org.springframework.data.mongodb.repository.MongoRepository; import java.util.*; public interface EmployerProfileRepository extends MongoRepository<EmployerProfile,String>{Optional<EmployerProfile> findByVendorId(String vendorId);}

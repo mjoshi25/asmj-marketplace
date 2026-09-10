@@ -1,0 +1,3 @@
+package com.asmj.marketplace.product.model;
+import lombok.*;import org.springframework.data.annotation.Id;import org.springframework.data.mongodb.core.mapping.Document;import java.time.Instant;import java.util.*;
+@Data @Builder @NoArgsConstructor @AllArgsConstructor @Document("carts") public class Cart{@Id private String id;private String userId;@Builder.Default private List<Item> items=new ArrayList<>();private Instant updatedAt;@Data @Builder @NoArgsConstructor @AllArgsConstructor public static class Item{private String productId,variantId,vendorId,name,variantName,image;private int quantity;private double unitPrice;}}

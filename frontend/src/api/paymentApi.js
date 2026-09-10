@@ -1,0 +1,11 @@
+import http from "./http";
+export const uploadPaymentProof=p=>http.post("/payments/upload",p);
+export const uploadPaymentScreenshot=(file)=>{const f=new FormData();f.append("file",file);f.append("purpose","payment");return http.post("/uploads",f,{headers:{"Content-Type":"multipart/form-data"}})};
+export const getMyPayments=()=>http.get("/payments/my");
+export const getBookingPayments=id=>http.get(`/payments/booking/${id}`);
+export const getMyInvoices=()=>http.get("/payments/invoices/my");
+export const getVendorPayments=()=>http.get("/payments/vendor");
+export const getVendorInvoices=()=>http.get("/payments/invoices/vendor");
+export const getAdminPayments=()=>http.get("/admin/payments");
+export const reviewPayment=(id,p)=>http.put(`/admin/payments/${id}/review`,p);
+export const getAdminInvoices=()=>http.get("/admin/payments/invoices");

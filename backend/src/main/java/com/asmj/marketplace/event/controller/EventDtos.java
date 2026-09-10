@@ -1,0 +1,2 @@
+package com.asmj.marketplace.event.controller; import java.time.*;import java.util.*;
+public class EventDtos { public record EventRequest(String name,String category,String description,LocalDate eventDate,LocalTime startTime,LocalTime endTime,String venue,String address,String city,int capacity,double ticketPrice,LocalDateTime registrationDeadline,List<String> images,String terms){} public record RegistrationRequest(String attendeeName,String attendeeMobile,int quantity){} public record StatusRequest(String status,String note){} }

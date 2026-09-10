@@ -1,0 +1,3 @@
+package com.asmj.marketplace.product.model;
+import lombok.*;import org.springframework.data.annotation.Id;import org.springframework.data.mongodb.core.index.Indexed;import org.springframework.data.mongodb.core.mapping.Document;import java.time.*;import java.util.*;
+@Data @Builder @NoArgsConstructor @AllArgsConstructor @Document("product_coupons") public class Coupon{@Id private String id;@Indexed(unique=true) private String code;private String name,type;private double value,minOrder,maxDiscount;private Instant validFrom,validTo;private int usageLimit,usedCount;private boolean active;private Set<String> vendorIds;}

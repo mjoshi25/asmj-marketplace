@@ -1,0 +1,1 @@
+package com.asmj.marketplace.review.repository;import com.asmj.marketplace.review.model.Review;import org.springframework.data.mongodb.repository.MongoRepository;import java.util.*;public interface ReviewRepository extends MongoRepository<Review,String>{List<Review> findByPostIdOrderByCreatedAtDesc(String postId);List<Review> findAllByOrderByCreatedAtDesc();}

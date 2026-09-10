@@ -1,0 +1,3 @@
+package com.asmj.marketplace.job.model;
+import lombok.*; import org.springframework.data.annotation.*; import org.springframework.data.mongodb.core.index.Indexed; import org.springframework.data.mongodb.core.mapping.Document; import java.time.Instant;
+@Data @Builder @NoArgsConstructor @AllArgsConstructor @Document("job_interviews") public class JobInterview { @Id private String id; @Indexed private String applicationId; private String postId,vendorId,candidateId; private Instant scheduledAt; private Integer durationMinutes; private String mode,meetingUrl,location,interviewerName,interviewerEmail,notes,status; private Instant createdAt,updatedAt; }

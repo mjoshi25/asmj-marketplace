@@ -1,0 +1,2 @@
+package com.asmj.marketplace.event.repository; import com.asmj.marketplace.event.model.EventRegistration; import org.springframework.data.mongodb.repository.MongoRepository; import java.util.*;
+public interface EventRegistrationRepository extends MongoRepository<EventRegistration,String>{ List<EventRegistration> findByUserIdOrderByRegisteredAtDesc(String userId); List<EventRegistration> findByVendorIdOrderByRegisteredAtDesc(String vendorId); List<EventRegistration> findByEventIdAndStatusIn(String eventId,List<String> statuses); }

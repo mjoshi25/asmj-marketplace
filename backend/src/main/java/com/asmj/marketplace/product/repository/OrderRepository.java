@@ -1,0 +1,1 @@
+package com.asmj.marketplace.product.repository;import com.asmj.marketplace.product.model.Order;import org.springframework.data.mongodb.repository.MongoRepository;import java.util.*;public interface OrderRepository extends MongoRepository<Order,String>{List<Order> findByCustomerIdOrderByCreatedAtDesc(String id);List<Order> findByVendorIdOrderByCreatedAtDesc(String id);}

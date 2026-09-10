@@ -1,0 +1,4 @@
+package com.asmj.marketplace.insurance.model;
+import lombok.*;import org.springframework.data.annotation.*;import org.springframework.data.mongodb.core.mapping.Document;import java.time.Instant;import java.util.*;
+@Data @Builder @NoArgsConstructor @AllArgsConstructor @Document("insurance_plans")
+public class InsurancePlan { @Id String id; String vendorId; String insurerName; String planName; String insuranceType; String description; String coverageSummary; double sumInsured; double premium; String premiumFrequency; Integer minEntryAge; Integer maxEntryAge; String city; List<String> benefits; List<String> exclusions; String claimProcess; String claimSettlementInfo; List<String> documents; List<String> images; boolean approved; boolean active; boolean featured; int views; Instant createdAt; Instant updatedAt; }

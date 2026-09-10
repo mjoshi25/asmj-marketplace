@@ -1,0 +1,1 @@
+package com.asmj.marketplace.product.repository;import com.asmj.marketplace.product.model.Cart;import org.springframework.data.mongodb.repository.MongoRepository;import java.util.*;public interface CartRepository extends MongoRepository<Cart,String>{Optional<Cart> findByUserId(String userId);}

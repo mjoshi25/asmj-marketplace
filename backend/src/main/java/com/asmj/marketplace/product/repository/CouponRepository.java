@@ -1,0 +1,1 @@
+package com.asmj.marketplace.product.repository;import com.asmj.marketplace.product.model.Coupon;import org.springframework.data.mongodb.repository.MongoRepository;import java.util.*;public interface CouponRepository extends MongoRepository<Coupon,String>{Optional<Coupon> findByCodeIgnoreCase(String code);List<Coupon> findByActiveTrue();}

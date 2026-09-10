@@ -1,0 +1,1 @@
+package com.asmj.marketplace.favorite.repository;import com.asmj.marketplace.favorite.model.Favorite;import org.springframework.data.mongodb.repository.MongoRepository;import java.util.*;public interface FavoriteRepository extends MongoRepository<Favorite,String>{Optional<Favorite> findByUserIdAndPostId(String u,String p);List<Favorite> findByUserId(String u);}

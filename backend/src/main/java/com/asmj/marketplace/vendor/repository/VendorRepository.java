@@ -1,0 +1,1 @@
+package com.asmj.marketplace.vendor.repository; import com.asmj.marketplace.vendor.model.Vendor; import org.springframework.data.mongodb.repository.MongoRepository; import java.util.*; public interface VendorRepository extends MongoRepository<Vendor,String>{Optional<Vendor> findByUserId(String userId);List<Vendor> findByVerificationStatus(Vendor.VerificationStatus s);}

@@ -1,0 +1,15 @@
+import http from "./http";
+export const getServices=()=>http.get("/services");
+export const getVendorServices=()=>http.get("/services/vendor");
+export const saveService=p=>http.post("/services/vendor",p);
+export const updateService=(id,p)=>http.put(`/services/vendor/${id}`,p);
+export const getSchedules=()=>http.get("/services/vendor/schedules");
+export const saveSchedule=p=>http.post("/services/vendor/schedules",p);
+export const createServiceBooking=p=>http.post("/services/bookings",p);
+export const getMyServiceBookings=()=>http.get("/services/bookings/my");
+export const getVendorServiceBookings=()=>http.get("/services/bookings/vendor");
+export const updateServiceBookingStatus=(id,p)=>http.put(`/services/bookings/${id}/status`,p);
+export const completeServiceBooking=(id,p)=>http.post(`/services/bookings/${id}/complete`,p);
+export const getAdminServices=()=>http.get("/admin/services");
+export const approveService=(id,approved)=>http.put(`/admin/services/${id}/approval`,null,{params:{approved}});
+export const getAdminServiceBookings=()=>http.get("/admin/services/bookings");

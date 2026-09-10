@@ -1,0 +1,3 @@
+package com.asmj.marketplace.job.model;
+import lombok.*; import org.springframework.data.annotation.*; import org.springframework.data.mongodb.core.index.Indexed; import org.springframework.data.mongodb.core.mapping.Document; import java.time.*;
+@Data @Builder @NoArgsConstructor @AllArgsConstructor @Document("job_offers") public class JobOffer { @Id private String id; @Indexed private String applicationId; private String postId,vendorId,candidateId; private Double annualCtc; private String currency,designation,joiningLocation; private Instant joiningDate,expiresAt; private String status,notes; private Instant createdAt,updatedAt; }
