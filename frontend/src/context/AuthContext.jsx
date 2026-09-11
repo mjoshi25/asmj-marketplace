@@ -47,13 +47,31 @@ export function AuthProvider({ children }) {
     finally { setLoading(false); }
   };
 
+  const refreshUser = async () => {
+    const response = await meApi();
+    const u = response.data?.data || response.data;
+    if (u) {
+      setUser(u);
+      localStorage.setItem("asmj_user", JSON.stringify(u));
+    }
+    return u;
+  };
+
+  const updateUser = (patch) => {
+    setUser(current => {
+      const next = { ...(current || {}), ...(patch || {}) };
+      localStorage.setItem("asmj_user", JSON.stringify(next));
+      return next;
+    });
+  };
+
   const logout = () => {
     localStorage.removeItem("asmj_token");
     localStorage.removeItem("asmj_user");
     setUser(null);
   };
 
-  const value = useMemo(() => ({ user, loading, login, register, logout }), [user, loading]);
+  const value = useMemo(() => ({ user, loading, login, register, logout, refreshUser, updateUser }), [user, loading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

@@ -19,7 +19,7 @@ public class UserService {
     public User updateProfile(String email, UserDtos.UpdateProfileRequest r){
         User u=me(email);
         users.findByMobile(r.mobile()).ifPresent(existing->{if(!existing.getId().equals(u.getId()))throw new IllegalArgumentException("Mobile number is already registered");});
-        u.setName(r.name().trim());u.setMobile(r.mobile().trim());u.setProfileImage(r.profileImage());u.setUpdatedAt(Instant.now());return users.save(u);
+        u.setName(r.name().trim());u.setMobile(r.mobile().trim());if(r.profileImage()!=null&&!r.profileImage().isBlank())u.setProfileImage(r.profileImage().trim());u.setUpdatedAt(Instant.now());return users.save(u);
     }
     public User updateProfileImage(String email,String imageUrl){User u=me(email);u.setProfileImage(imageUrl);u.setUpdatedAt(Instant.now());return users.save(u);}
     public void changePassword(String email, UserDtos.ChangePasswordRequest r){

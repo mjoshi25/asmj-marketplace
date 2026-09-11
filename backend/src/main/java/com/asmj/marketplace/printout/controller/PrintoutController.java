@@ -1,0 +1,13 @@
+package com.asmj.marketplace.printout.controller;
+import com.asmj.marketplace.common.response.ApiResponse; import com.asmj.marketplace.printout.dto.PrintoutDtos.*; import com.asmj.marketplace.printout.service.*; import lombok.RequiredArgsConstructor; import org.springframework.security.access.prepost.PreAuthorize; import org.springframework.web.bind.annotation.*; import java.util.*;
+@RestController @RequestMapping("/api/printouts") @RequiredArgsConstructor public class PrintoutController { private final PrintoutServiceManager services; private final PrintoutRequestManager requests;
+ @GetMapping("/services") public ApiResponse<?> publicServices(){return ApiResponse.ok("",services.publicServices());}
+ @GetMapping("/services/mine") @PreAuthorize("hasRole('VENDOR')") public ApiResponse<?> mineServices(org.springframework.security.core.Authentication a){return ApiResponse.ok("",services.mine(a.getName()));}
+ @PostMapping("/services") @PreAuthorize("hasRole('VENDOR')") public ApiResponse<?> save(org.springframework.security.core.Authentication a,@RequestBody ServiceRequest r){return ApiResponse.ok("Saved",services.save(a.getName(),r,null));}
+ @PutMapping("/services/{id}") @PreAuthorize("hasRole('VENDOR')") public ApiResponse<?> update(org.springframework.security.core.Authentication a,@PathVariable String id,@RequestBody ServiceRequest r){return ApiResponse.ok("Updated",services.save(a.getName(),r,id));}
+ @DeleteMapping("/services/{id}") @PreAuthorize("hasRole('VENDOR')") public ApiResponse<?> delete(org.springframework.security.core.Authentication a,@PathVariable String id){services.delete(a.getName(),id);return ApiResponse.ok("Deleted",null);}
+ @PostMapping("/requests") @PreAuthorize("isAuthenticated()") public ApiResponse<?> create(org.springframework.security.core.Authentication a,@RequestBody RequestCreate r){return ApiResponse.ok("Printout request submitted",requests.create(a.getName(),r));}
+ @GetMapping("/requests/my") @PreAuthorize("isAuthenticated()") public ApiResponse<?> my(org.springframework.security.core.Authentication a){return ApiResponse.ok("",requests.mine(a.getName()));}
+ @GetMapping("/requests/vendor") @PreAuthorize("hasRole('VENDOR')") public ApiResponse<?> vendor(org.springframework.security.core.Authentication a){return ApiResponse.ok("",requests.vendor(a.getName()));}
+ @PutMapping("/requests/{id}/status") @PreAuthorize("isAuthenticated()") public ApiResponse<?> status(org.springframework.security.core.Authentication a,@PathVariable String id,@RequestBody StatusRequest r){return ApiResponse.ok("Status updated",requests.status(a.getName(),id,r));}
+}

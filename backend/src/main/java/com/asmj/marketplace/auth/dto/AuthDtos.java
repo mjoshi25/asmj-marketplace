@@ -13,5 +13,5 @@ public final class AuthDtos {
         @NotNull User.Role role
     ) {}
     public record LoginRequest(@Email @NotBlank String email,@NotBlank String password) {}
-    public record AuthResponse(String token,String refreshToken,String id,String name,String email,String contactNumber,java.util.Set<User.Role> roles) {}
+    public record AuthResponse(String token,String refreshToken,String id,String name,String email,String contactNumber,java.util.Set<User.Role> roles,String profileImage) {}
 }

@@ -39,6 +39,6 @@ public class AuthService {
 
     private AuthResponse response(User u) {
         String token = jwt.generate(u.getEmail(), u.getRoles().stream().map(Enum::name).toList());
-        return new AuthResponse(token, token, u.getId(), u.getName(), u.getEmail(), u.getMobile(), u.getRoles());
+        return new AuthResponse(token, token, u.getId(), u.getName(), u.getEmail(), u.getMobile(), u.getRoles(), u.getProfileImage());
     }
 }
