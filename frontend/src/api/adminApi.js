@@ -22,3 +22,7 @@ export const getVendorApprovalDetails=id=>http.get(`/admin/vendors/${id}/details
 export const getPendingPrintoutServices=()=>http.get("/admin/printouts/pending");
 export const approvePrintoutService=id=>http.put(`/admin/printouts/${id}/approve`);
 export const rejectPrintoutService=id=>http.put(`/admin/printouts/${id}/reject`);
+
+export const getAdminListings=()=>http.get("/admin/listings");
+export const suspendListing=id=>http.put(`/admin/posts/${id}/suspend`);
+export const reactivateListing=id=>http.put(`/admin/posts/${id}/reactivate`);

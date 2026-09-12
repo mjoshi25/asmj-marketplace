@@ -10,4 +10,5 @@ import com.asmj.marketplace.common.response.ApiResponse; import com.asmj.marketp
  @GetMapping("/requests/my") @PreAuthorize("isAuthenticated()") public ApiResponse<?> my(org.springframework.security.core.Authentication a){return ApiResponse.ok("",requests.mine(a.getName()));}
  @GetMapping("/requests/vendor") @PreAuthorize("hasRole('VENDOR')") public ApiResponse<?> vendor(org.springframework.security.core.Authentication a){return ApiResponse.ok("",requests.vendor(a.getName()));}
  @PutMapping("/requests/{id}/status") @PreAuthorize("isAuthenticated()") public ApiResponse<?> status(org.springframework.security.core.Authentication a,@PathVariable String id,@RequestBody StatusRequest r){return ApiResponse.ok("Status updated",requests.status(a.getName(),id,r));}
+ @PostMapping("/requests/{id}/payment-proof") @PreAuthorize("isAuthenticated()") public ApiResponse<?> paymentProof(org.springframework.security.core.Authentication a,@PathVariable String id,@RequestBody PaymentProofRequest r){return ApiResponse.ok("Payment proof submitted",requests.paymentProof(a.getName(),id,r));}
 }

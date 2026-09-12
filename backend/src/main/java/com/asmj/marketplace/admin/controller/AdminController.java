@@ -60,6 +60,21 @@ public class AdminController {
         return ApiResponse.ok("Role removed", safe(admin.removeRole(id, role, authentication.getName())));
     }
 
+    @GetMapping("/listings")
+    public ApiResponse<List<Post>> listings() {
+        return ApiResponse.ok("All listings", posts.adminAll());
+    }
+
+    @PutMapping("/posts/{id}/suspend")
+    public ApiResponse<Post> suspend(@PathVariable String id) {
+        return ApiResponse.ok("Listing suspended", posts.changeAdminStatus(id, Post.PostStatus.SUSPENDED));
+    }
+
+    @PutMapping("/posts/{id}/reactivate")
+    public ApiResponse<Post> reactivate(@PathVariable String id) {
+        return ApiResponse.ok("Listing reactivated", posts.changeAdminStatus(id, Post.PostStatus.PUBLISHED));
+    }
+
     @GetMapping("/approvals")
     public ApiResponse<List<Post>> approvals() {
         return ApiResponse.ok("Pending posts", posts.pending());

@@ -7,3 +7,4 @@ export const createPrintoutRequest=p=>http.post("/printouts/requests",p);
 export const getMyPrintoutRequests=()=>http.get("/printouts/requests/my");
 export const getVendorPrintoutRequests=()=>http.get("/printouts/requests/vendor");
 export const updatePrintoutStatus=(id,p)=>http.put(`/printouts/requests/${id}/status`,p);
+export const uploadPrintoutPaymentProof=(id,p)=>http.post(`/printouts/requests/${id}/payment-proof`,p);
