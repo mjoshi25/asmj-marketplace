@@ -52,9 +52,20 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private User ensureUser(String name,String email,String mobile,Set<User.Role> roles){
-        return users.findByEmailIgnoreCase(email).orElseGet(() -> users.save(User.builder().name(name).email(email).mobile(mobile)
-            .password(encoder.encode("Demo@12345")).roles(new HashSet<>(roles)).status(User.Status.ACTIVE)
-            .createdAt(Instant.now()).updatedAt(Instant.now()).build()));
+        User user=users.findByEmailIgnoreCase(email).orElse(null);
+        if(user==null){
+            user=User.builder().name(name).email(email).mobile(mobile)
+                .password(encoder.encode("Demo@12345")).roles(new HashSet<>(roles)).status(User.Status.ACTIVE)
+                .createdAt(Instant.now()).updatedAt(Instant.now()).build();
+        }else{
+            if(user.getRoles()==null) user.setRoles(new HashSet<>());
+            user.getRoles().addAll(roles);
+            if(user.getStatus()==null) user.setStatus(User.Status.ACTIVE);
+            if(user.getName()==null||user.getName().isBlank()) user.setName(name);
+            if(user.getMobile()==null||user.getMobile().isBlank()) user.setMobile(mobile);
+            user.setUpdatedAt(Instant.now());
+        }
+        return users.save(user);
     }
 
     private Map<String,Category> seedCategories(Instant now){

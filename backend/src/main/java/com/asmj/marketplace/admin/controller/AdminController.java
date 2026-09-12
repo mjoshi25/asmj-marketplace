@@ -9,7 +9,9 @@ import com.asmj.marketplace.post.model.Post;
 import com.asmj.marketplace.post.service.PostService;
 import com.asmj.marketplace.user.model.User;
 import com.asmj.marketplace.vendor.model.Vendor;
-import com.asmj.marketplace.vendor.service.VendorService;import com.asmj.marketplace.review.model.Review;import com.asmj.marketplace.review.repository.ReviewRepository;
+import com.asmj.marketplace.vendor.service.VendorService;
+import com.asmj.marketplace.printout.model.PrintoutService;
+import com.asmj.marketplace.printout.service.PrintoutServiceManager;import com.asmj.marketplace.review.model.Review;import com.asmj.marketplace.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -28,6 +30,7 @@ public class AdminController {
     private final ApprovalService approvalService;
     private final PostService posts;
     private final VendorService vendors;private final ReviewRepository reviews;
+    private final PrintoutServiceManager printouts;
 
     @GetMapping("/dashboard")
     public ApiResponse<Map<String, Object>> dashboard() {
@@ -120,6 +123,22 @@ public class AdminController {
     @GetMapping("/approvals/{targetId}/history")
     public ApiResponse<List<Approval>> history(@PathVariable String targetId) {
         return ApiResponse.ok("Approval history", approvalService.history(targetId));
+    }
+
+
+    @GetMapping("/printouts/pending")
+    public ApiResponse<List<PrintoutService>> pendingPrintouts() {
+        return ApiResponse.ok("Pending printout services", printouts.pendingApprovals());
+    }
+
+    @PutMapping("/printouts/{id}/approve")
+    public ApiResponse<PrintoutService> approvePrintout(@PathVariable String id) {
+        return ApiResponse.ok("Printout service approved", printouts.approve(id));
+    }
+
+    @PutMapping("/printouts/{id}/reject")
+    public ApiResponse<PrintoutService> rejectPrintout(@PathVariable String id) {
+        return ApiResponse.ok("Printout service rejected", printouts.reject(id));
     }
 
     @GetMapping("/reviews") public ApiResponse<List<Review>> reviews(){return ApiResponse.ok("Reviews",reviews.findAllByOrderByCreatedAtDesc());}

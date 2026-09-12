@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMyPrintoutServices, savePrintoutService } from "../../api/printoutApi";
+import { getMyPrintoutServices, savePrintoutService, deletePrintoutService } from "../../api/printoutApi";
 
 const initial = {
   serviceName: "Printout Service",
@@ -36,6 +36,7 @@ export default function PrintoutPricing() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [approvalStatus, setApprovalStatus] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -49,6 +50,7 @@ export default function PrintoutPricing() {
         if (active && saved) {
           setForm({ ...initial, ...saved });
           setServiceId(saved.id || "");
+          setApprovalStatus(saved.approvalStatus || "");
         }
       } catch (err) {
         if (active) setError(err.response?.data?.message || "Could not load printout pricing");
@@ -90,8 +92,9 @@ export default function PrintoutPricing() {
       const response = await savePrintoutService(payload, serviceId || undefined);
       const saved = response.data?.data ?? response.data;
       if (saved?.id || saved?._id) setServiceId(saved.id || saved._id);
+      setApprovalStatus(saved?.approvalStatus || "PENDING");
       if (saved) setForm((current) => ({ ...current, ...saved }));
-      setMessage(response.data?.message || "Printout pricing saved successfully");
+      setMessage(response.data?.message || "Printout pricing submitted for admin approval");
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Could not save printout pricing");
     } finally {
@@ -99,13 +102,18 @@ export default function PrintoutPricing() {
     }
   };
 
+  const remove = async () => {
+    if (!serviceId || !window.confirm("Delete this printout service?")) return;
+    try { await deletePrintoutService(serviceId); setServiceId(""); setApprovalStatus(""); setForm(initial); setMessage("Printout service deleted"); }
+    catch (err) { setError(err.response?.data?.message || "Could not delete printout service"); }
+  };
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="page-shell vendor-bg">
       <p className="eyebrow">VENDOR SETTINGS</p>
       <h1 className="page-title">Printout pricing</h1>
-      <p className="mt-2 text-sm text-slate-500">
-        Configure your printing rates and delivery rules. Home delivery is charged as a percentage of the printing subtotal.
-      </p>
+      <p className="mt-2 text-sm text-slate-500">Configure your printing rates and delivery rules. New or edited services are reviewed by Admin before becoming visible.</p>
+      {approvalStatus && <div className="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm font-semibold text-indigo-700">Approval status: {approvalStatus}</div>}
 
       {message && <div className="alert mt-4">{message}</div>}
       {error && <div className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</div>}
@@ -124,7 +132,7 @@ export default function PrintoutPricing() {
         <label>Lamination charge<input className="input" type="number" min="0" step="0.01" name="laminationCharge" value={form.laminationCharge ?? 0} onChange={change} /></label>
         <div className="flex items-center gap-2 self-end"><input id="pickupAvailable" type="checkbox" name="pickupAvailable" checked={!!form.pickupAvailable} onChange={change} /><label htmlFor="pickupAvailable">Pickup available</label></div>
         <div className="flex items-center gap-2"><input id="homeDeliveryAvailable" type="checkbox" name="homeDeliveryAvailable" checked={!!form.homeDeliveryAvailable} onChange={change} /><label htmlFor="homeDeliveryAvailable">Home delivery available</label></div>
-        <button className="btn-primary sm:col-span-2" type="submit" disabled={saving || loading}>{saving ? "Saving..." : "Save pricing"}</button>
+        <div className="flex flex-wrap gap-2 sm:col-span-2"><button className="btn-primary" type="submit" disabled={saving || loading}>{saving ? "Saving..." : serviceId ? "Update pricing" : "Submit for approval"}</button>{serviceId && <button className="btn-secondary text-red-600" type="button" onClick={remove} disabled={saving}>Delete service</button>}</div>
       </form>
     </div>
   );
