@@ -47,6 +47,19 @@ public class BookingService {
         if("PRODUCT".equals(t) && (r.address()==null||r.address().isBlank())) throw new IllegalArgumentException("Delivery address is required");
     }
 
+    public List<Booking> adminAll(){return enrich(bookings.findAll());}
+
+    public Booking adminUpdateStatus(String id,String status,String note){
+        Booking b=bookings.findById(id).orElseThrow(()->new IllegalArgumentException("Booking not found"));
+        String next=status==null||status.isBlank()?b.getStatus():status.toUpperCase();
+        if(!Set.of("PENDING","REGISTERED","ORDER_PLACED","CONFIRMED","PROCESSING","SHIPPED","DELIVERED","SCHEDULED","PICKUP","RETURNED","COMPLETED","ATTENDED","VISIT_SCHEDULED","NEGOTIATION","REJECTED","CANCELLED").contains(next)) throw new IllegalArgumentException("Invalid booking status");
+        var actor=users.findByEmailIgnoreCase("admin@asmj.co.in").orElse(null);
+        if(actor!=null) change(b,next,actor,note==null?"Updated by administrator":note); else {b.setStatus(next);b.setUpdatedAt(Instant.now());}
+        Booking saved=bookings.save(b);
+        notifications.create(b.getUserId(),"Booking status updated","Your booking is now "+next.toLowerCase().replace('_',' ')+".","BOOKING_STATUS");
+        return enrichOne(saved);
+    }
+
     public List<Booking> mine(String email){return enrich(bookings.findByUserIdOrderByCreatedAtDesc(users.findByEmailIgnoreCase(email).orElseThrow().getId()));}
     public List<Booking> vendor(String email){var user=users.findByEmailIgnoreCase(email).orElseThrow();var vendor=vendors.findByUserId(user.getId()).orElseThrow(()->new IllegalArgumentException("Vendor profile not found"));return enrich(bookings.findByVendorIdOrderByCreatedAtDesc(vendor.getId()));}
     public Booking one(String email,String id){var user=users.findByEmailIgnoreCase(email).orElseThrow();Booking b=bookings.findById(id).orElseThrow(()->new IllegalArgumentException("Booking not found"));var vendor=vendors.findByUserId(user.getId()).orElse(null);if(!Objects.equals(b.getUserId(),user.getId()) && (vendor==null||!Objects.equals(b.getVendorId(),vendor.getId())) && !user.getRoles().contains(com.asmj.marketplace.user.model.User.Role.ADMIN)) throw new IllegalArgumentException("You cannot view this booking");return enrichOne(b);}

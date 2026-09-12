@@ -46,6 +46,14 @@ public class BookingController {
                                                      @RequestBody Map<String,String> body) {
         return ApiResponse.ok("Booking status updated", service.updateVendorStatus(a.getName(), id, body.getOrDefault("status", "PENDING"), body.get("note")));
     }
+    @GetMapping("/admin/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<List<Booking>> adminAll() { return ApiResponse.ok("All bookings", service.adminAll()); }
+
+    @PutMapping("/admin/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Booking> adminStatus(@PathVariable String id, @RequestBody Map<String,String> body) { return ApiResponse.ok("Booking status updated", service.adminUpdateStatus(id, body.get("status"), body.get("note"))); }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('VENDOR') or hasRole('ADMIN')")
     public ApiResponse<Booking> one(Authentication a, @PathVariable String id) {

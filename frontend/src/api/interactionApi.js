@@ -23,3 +23,5 @@ export const sendMessage = (id,payload) => http.post(`/chat/${id}/messages`, pay
 export const markChatRead = (id) => http.post(`/chat/${id}/read`);
 export const searchChatMessages = (id,q) => http.get(`/chat/${id}/messages/search`, {params:{q}});
 export const deleteChatMessage = (id,messageId) => http.delete(`/chat/${id}/messages/${messageId}`);
+export const markAllNotificationsRead = () =>
+  http.put("/notifications/read-all");
