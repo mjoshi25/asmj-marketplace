@@ -34,7 +34,7 @@ public class RentalService {
   RentalRoute route=route(q.fromLocationId(),q.toLocationId());
   validateJourney(route,journey);
   String vehicleType=required(q.vehicleType(),"Vehicle type is required");
-  double km=q.estimatedKm()!=null&&q.estimatedKm()>0?q.estimatedKm():route.getEstimatedKm();
+  double km=q.estimatedKm()!=null&&q.estimatedKm()>0?q.estimatedKm():route.getEstimatedKm(); if(journey==RentalBooking.JourneyType.ROUND_TRIP) km*=2;
   FareRule rule=findFare(route.getId(),vehicleType,journey);
   RentalBooking.FareBreakdown b=calculate(rule,km,q.travelDate(),q.pickupTime(),0,0,0,q.discountCode());
   return new LinkedHashMap<>(Map.of("route",route,"fare",b,"vehicleType",vehicleType,"journeyType",journey,"estimatedKm",km));
