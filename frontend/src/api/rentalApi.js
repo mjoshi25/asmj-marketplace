@@ -35,3 +35,5 @@ export const adminRentalDiscounts=()=>http.get("/rentals/admin/discounts");
 export const saveRentalDiscount=p=>http.post("/rentals/admin/discounts",p);
 export const deleteRentalDiscount=id=>http.delete(`/rentals/admin/discounts/${id}`);
 export const adminRentalBookings=()=>http.get("/rentals/admin/bookings");
+
+export const getConfiguredLocations=getRentalLocations;

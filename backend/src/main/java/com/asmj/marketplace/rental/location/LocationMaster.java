@@ -13,6 +13,7 @@ public class LocationMaster {
  @Indexed private String stateCode;
  @Indexed private String stateName;
  @Indexed private String cityName;
+ @Indexed private String pincode;
  @Indexed private String slug;
  @Builder.Default private boolean active=true;
  @Builder.Default private boolean originAllowed=true;
