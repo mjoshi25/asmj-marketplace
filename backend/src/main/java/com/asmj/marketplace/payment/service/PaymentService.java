@@ -4,6 +4,7 @@ import com.asmj.marketplace.payment.dto.PaymentDtos.*;
 import com.asmj.marketplace.payment.model.*;
 import com.asmj.marketplace.payment.repository.*;
 import com.asmj.marketplace.common.response.ApiResponse;
+import com.asmj.marketplace.revenue.service.RevenueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,7 +17,7 @@ import java.util.*;
 
 @Service @RequiredArgsConstructor
 public class PaymentService {
- private final PaymentTransactionRepository payments; private final InvoiceRepository invoices; private final MongoTemplate mongo;
+ private final PaymentTransactionRepository payments; private final InvoiceRepository invoices; private final MongoTemplate mongo; private final RevenueService revenueService;
  private String tx(){return "PAY-"+UUID.randomUUID().toString().replace("-","").substring(0,12).toUpperCase();}
  private String inv(){return "INV-"+UUID.randomUUID().toString().replace("-","").substring(0,12).toUpperCase();}
  private String date(String d){ if(d==null||d.isBlank()) return LocalDate.now().toString(); try{return LocalDate.parse(d).toString();}catch(Exception e){throw new IllegalArgumentException("Payment date must be YYYY-MM-DD");}}
@@ -59,7 +60,7 @@ public class PaymentService {
    if(!Set.of("VERIFIED","REJECTED").contains(r.getStatus())) throw new IllegalArgumentException("Status must be VERIFIED or REJECTED");
    p.setStatus(r.getStatus());p.setVerifiedBy(adminId);p.setVerifiedAt(Instant.now());p.setRejectionReason(r.getRejectionReason());p.setUpdatedAt(Instant.now());
    p=payments.save(p);
-   if("VERIFIED".equals(p.getStatus())) createInvoice(p);
+   if("VERIFIED".equals(p.getStatus())) { createInvoice(p); revenueService.recordVerifiedPayment(p); }
    return p;
  }
  private Invoice createInvoice(PaymentTransaction p){
