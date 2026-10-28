@@ -3,14 +3,14 @@ import { X, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-export default function AuthModal({ mode, onClose, onSwitch }) {
+export default function AuthModal({ mode, onClose, onSwitch, initialRole = "USER" }) {
   const isRegister = mode === "register";
   const { login, register, loading } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
-    name: "", email: "", contactNumber: "", password: "", role: "USER"
+    name: "", email: "", contactNumber: "", password: "", role: initialRole
   });
 
   const change = e => setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,7 +22,7 @@ export default function AuthModal({ mode, onClose, onSwitch }) {
       const u = isRegister ? await register(form) : await login({ email: form.email, password: form.password });
       const roles = u?.roles || (u?.role ? [u.role] : []);
       onClose();
-      navigate(roles.includes("ADMIN") ? "/admin" : roles.includes("VENDOR") ? "/vendor" : "/dashboard");
+      navigate(isRegister && form.role === "VENDOR" ? "/vendor/profile" : roles.includes("ADMIN") ? "/admin" : roles.includes("VENDOR") ? "/vendor" : "/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.error || "Unable to complete the request.");
     }

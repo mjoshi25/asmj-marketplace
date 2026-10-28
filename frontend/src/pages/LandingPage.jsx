@@ -41,6 +41,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5">
           <Logo />
           <div className="flex gap-2">
+            <button className="hidden rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white sm:inline-flex" onClick={() => navigate("/local")}>Local network</button>
             <button className="btn-secondary" onClick={() => setAuth("login")}>Login</button>
             <button className="btn-primary" onClick={() => setAuth("register")}>Register</button>
           </div>

@@ -37,6 +37,7 @@ public class VendorService {
     public Vendor me(String email){User u=users.findByEmailIgnoreCase(email).orElseThrow();return repo.findByUserId(u.getId()).orElseThrow(()->new IllegalArgumentException("Vendor profile not found"));}
     public Vendor get(String id){return repo.findById(id).orElseThrow();}
     public List<Vendor> all(){return repo.findAll();}
+    public List<Vendor> publicApproved(){return repo.findByVerificationStatus(Vendor.VerificationStatus.APPROVED).stream().filter(v -> v.getStatus()==null || v.getStatus()==Vendor.Status.ACTIVE).toList();}
     public List<Vendor> pending(){return repo.findByVerificationStatus(Vendor.VerificationStatus.PENDING);}
     public Vendor setApproval(String id,boolean ok){Vendor v=get(id);v.setVerificationStatus(ok?Vendor.VerificationStatus.APPROVED:Vendor.VerificationStatus.REJECTED);return repo.save(v);}
 }

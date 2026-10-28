@@ -78,3 +78,10 @@ CLOUDINARY_API_SECRET=your-api-secret
 Vendor media is uploaded through `POST /api/uploads` as multipart form data with `file` and `purpose`. The listing stores Cloudinary URLs and metadata in MongoDB rather than binary file contents.
 
 Supported listing media purposes include product-images, service-images, event-images, insurance-images, job-images, tutor-images, rental-images and their corresponding document folders.
+
+## ASMJ Local Business Network additions
+
+- Public approved business directory: `GET /api/vendors/public` (returns public profile fields only).
+- Local promotion packages and payment-proof verification: `GET /api/local-promotions/featured`, `POST /api/local-promotions`, `GET /api/local-promotions/mine`, and admin routes under `/api/local-promotions/admin`.
+- Campaigns only become active after an admin verifies the payment proof; expired campaigns are removed from the public featured feed and marked expired when the promotion endpoints are accessed.
+- See `../README-LOCAL-BUSINESS-NETWORK.md` for the full setup and deployment notes.

@@ -1,4 +1,5 @@
 import http from "./http";
+export const getPublicVendors = () => http.get("/vendors/public");
 export const getMyVendor = () => http.get("/vendors/me");
 export const createVendor = (payload) => http.post("/vendors", payload);
 export const updateMyVendor = (payload) => http.put("/vendors/me", payload);
