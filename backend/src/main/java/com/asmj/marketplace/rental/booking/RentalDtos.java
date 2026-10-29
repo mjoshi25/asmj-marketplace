@@ -6,7 +6,7 @@ import com.asmj.marketplace.rental.location.*;
 import com.asmj.marketplace.rental.route.*;
 import com.asmj.marketplace.rental.vehicle.*;
 public final class RentalDtos { private RentalDtos(){}
- public record QuoteRequest(String fromLocationId,String toLocationId,String vehicleType,RentalBooking.JourneyType journeyType,LocalDate travelDate,LocalTime pickupTime,Integer passengerCount,String discountCode,Double estimatedKm){}
+ public record QuoteRequest(String fromLocationId,String toLocationId,String vehicleType,RentalBooking.JourneyType journeyType,LocalDate travelDate,LocalTime pickupTime,Integer passengerCount,String discountCode,Double estimatedKm,String vehicleId){}
  public record BookingRequest(String fromLocationId,String toLocationId,String vehicleType,RentalBooking.JourneyType journeyType,String pickupAddress,String pickupLandmark,String dropAddress,String dropLandmark,LocalDate travelDate,LocalTime pickupTime,LocalDate returnDate,LocalTime returnTime,Integer passengerCount,Integer luggageCount,String discountCode,String notes,String vehicleId,String driverId){}
  public record KmRequest(double km,Double lat,Double lng,Double toll,Double parking,Double otherCharges,String note){}
  public record StatusRequest(String status,String note){}

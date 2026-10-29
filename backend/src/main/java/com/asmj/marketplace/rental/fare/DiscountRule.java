@@ -12,6 +12,7 @@ public class DiscountRule {
  @Builder.Default private String code="";
  private String name,type;
  private double value,minFare,maxDiscount;
+ private double minKm,maxKm;
  private Instant validFrom,validTo;
  @Builder.Default private Set<String> vehicleTypes=new HashSet<>();
  @Builder.Default private Set<String> routeIds=new HashSet<>();

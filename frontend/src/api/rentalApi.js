@@ -2,6 +2,7 @@ import http from "./http";
 export const getRentalLocations=()=>http.get("/rentals/locations");
 export const getRentalRoutes=()=>http.get("/rentals/routes");
 export const getRentalQuote=p=>http.post("/rentals/quote",p);
+export const searchPublicRentalVehicles=(q="",vehicleType="")=>http.get("/rentals/public/vehicles",{params:{q,vehicleType}});
 export const createRentalBooking=p=>http.post("/rentals/bookings",p);
 export const getMyRentalBookings=()=>http.get("/rentals/bookings/my");
 export const getRentalBooking=id=>http.get(`/rentals/bookings/${id}`);
