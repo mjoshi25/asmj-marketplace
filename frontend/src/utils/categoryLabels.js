@@ -1,0 +1,17 @@
+const LABELS = {
+  PRODUCT: { party: "seller", contact: "Contact seller", question: "Have a question about this product?", enquiry: "Send your question to the seller and continue the conversation.", price: "Contact seller", reply: "Reply / Chat seller" },
+  SERVICE: { party: "service provider", contact: "Contact service provider", question: "Have a question about this service?", enquiry: "Send your question to the service provider and continue the conversation.", price: "Contact service provider", reply: "Reply / Chat service provider" },
+  EVENT: { party: "event organiser", contact: "Contact event organiser", question: "Have a question about this event?", enquiry: "Send your question to the event organiser and continue the conversation.", price: "Contact event organiser", reply: "Reply / Chat event organiser" },
+  TUTOR: { party: "tutor", contact: "Contact tutor", question: "Have a question about these classes?", enquiry: "Send your question to the tutor and continue the conversation.", price: "Contact tutor", reply: "Reply / Chat tutor" },
+  RENTAL: { party: "rental provider", contact: "Contact rental provider", question: "Have a question about this rental?", enquiry: "Send your question to the rental provider and continue the conversation.", price: "Contact rental provider", reply: "Reply / Chat rental provider" },
+  PROPERTY: { party: "property owner/agent", contact: "Contact property owner/agent", question: "Have a question about this property?", enquiry: "Send your question to the property owner/agent and continue the conversation.", price: "Contact property owner/agent", reply: "Reply / Chat property owner/agent" },
+  VEHICLE_RENTAL: { party: "vehicle rental provider", contact: "Contact vehicle rental provider", question: "Have a question about this vehicle rental?", enquiry: "Send your question to the vehicle rental provider and continue the conversation.", price: "Contact vehicle rental provider", reply: "Reply / Chat vehicle rental provider" },
+  JOB: { party: "employer/recruiter", contact: "Contact employer/recruiter", question: "Have a question about this job?", enquiry: "Send your question to the employer/recruiter and continue the conversation.", price: "Contact employer/recruiter", reply: "Reply / Chat employer/recruiter" },
+  INSURANCE: { party: "insurance provider", contact: "Contact insurance provider", question: "Have a question about this insurance listing?", enquiry: "Send your question to the insurance provider and continue the conversation.", price: "Contact insurance provider", reply: "Reply / Chat insurance provider" },
+  PRINTOUT: { party: "printout shop", contact: "Contact printout shop", question: "Have a question about this printout service?", enquiry: "Send your question to the printout shop and continue the conversation.", price: "Contact printout shop", reply: "Reply / Chat printout shop" },
+  PRINT_OUT: { party: "printout shop", contact: "Contact printout shop", question: "Have a question about this printout service?", enquiry: "Send your question to the printout shop and continue the conversation.", price: "Contact printout shop", reply: "Reply / Chat printout shop" },
+};
+export function getCategoryLabels(type) {
+  const key = String(type || "").toUpperCase().replace(/[ -]/g, "_");
+  return LABELS[key] || { party: "provider", contact: "Contact provider", question: "Have a question?", enquiry: "Send your question to the provider and continue the conversation.", price: "Contact provider", reply: "Reply / Chat provider" };
+}
