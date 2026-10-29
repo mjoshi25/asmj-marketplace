@@ -62,6 +62,13 @@ export default function LandingPage() {
             <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
               Discover products, services, events, insurance, jobs and tutors in one trusted marketplace.
             </p>
+            <button
+              type="button"
+              className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300/40 bg-emerald-400 px-4 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-950/20 transition hover:bg-emerald-300 sm:hidden"
+              onClick={() => navigate("/local")}
+            >
+              Explore ASMJ Local Business Network <ArrowRight size={16} />
+            </button>
           </div>
 
           <form onSubmit={search} className="mt-9 flex max-w-4xl flex-col gap-2 rounded-2xl bg-white p-2 sm:flex-row">

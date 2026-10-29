@@ -8,3 +8,6 @@ export const getMyPrintoutRequests=()=>http.get("/printouts/requests/my");
 export const getVendorPrintoutRequests=()=>http.get("/printouts/requests/vendor");
 export const updatePrintoutStatus=(id,p)=>http.put(`/printouts/requests/${id}/status`,p);
 export const uploadPrintoutPaymentProof=(id,p)=>http.post(`/printouts/requests/${id}/payment-proof`,p);
+
+export const getPendingPrintoutPaymentProofs=()=>http.get("/printouts/admin/payment-proofs/pending");
+export const reviewPrintoutPaymentProof=(id,p)=>http.put(`/printouts/admin/requests/${id}/payment-review`,p);

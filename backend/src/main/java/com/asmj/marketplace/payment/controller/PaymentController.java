@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.GrantedAuthority;
 @RestController @RequestMapping("/api/payments") @RequiredArgsConstructor
 public class PaymentController { private final PaymentService s; private String id(Authentication a){return a.getName();}
+ @GetMapping("/references") @PreAuthorize("isAuthenticated()") public ApiResponse<?> references(Authentication a){boolean admin=a.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(x->x.equals("ROLE_ADMIN"));boolean vendor=a.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(x->x.equals("ROLE_VENDOR"));return ApiResponse.ok("",s.referencesFor(id(a),vendor,admin));}
  @PostMapping("/upload") @PreAuthorize("isAuthenticated()") public ApiResponse<?> upload(Authentication a,@RequestBody PaymentRequest r){return ApiResponse.ok("Payment proof submitted for verification",s.submit(id(a), a.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(x->x.equals("ROLE_VENDOR")),r));}
  @GetMapping("/my") @PreAuthorize("isAuthenticated()") public ApiResponse<?> my(Authentication a){return ApiResponse.ok("",s.mine(id(a)));}
  @GetMapping("/booking/{bookingId}") @PreAuthorize("isAuthenticated()") public ApiResponse<?> booking(@PathVariable String bookingId){return ApiResponse.ok("",s.byBooking(bookingId));}
