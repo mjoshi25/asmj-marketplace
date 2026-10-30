@@ -67,7 +67,16 @@ public class RentalService {
  }
 
  public List<RentalBooking> mine(String email){return bookings.findByCustomerIdOrderByCreatedAtDesc(user(email).getId());}
- public List<RentalBooking> vendorBookings(String email){Vendor v=vendor(email);return bookings.findByVendorIdOrderByCreatedAtDesc(v.getId());}
+ public List<RentalBooking> vendorBookings(String email){
+  Vendor v=vendor(email);
+  // Include older bookings whose vendorId was not populated, provided their vehicle
+  // is owned by this vendor. The vendorId query remains the primary source.
+  Map<String,RentalBooking> result=new LinkedHashMap<>();
+  bookings.findByVendorIdOrderByCreatedAtDesc(v.getId()).forEach(b->result.put(b.getId(),b));
+  List<String> ownedVehicleIds=vehicles.findByVendorIdOrderByCreatedAtDesc(v.getId()).stream().map(Vehicle::getId).filter(Objects::nonNull).toList();
+  if(!ownedVehicleIds.isEmpty()) bookings.findByVehicleIdInOrderByCreatedAtDesc(ownedVehicleIds).forEach(b->result.putIfAbsent(b.getId(),b));
+  return result.values().stream().sorted(Comparator.comparing(RentalBooking::getCreatedAt,Comparator.nullsLast(Comparator.reverseOrder()))).toList();
+ }
  public List<RentalBooking> driverTrips(String email){Driver d=drivers.findByUserId(user(email).getId()).orElseThrow(()->new IllegalArgumentException("Driver profile not found"));return bookings.findByDriverIdOrderByTravelDateAscPickupTimeAsc(d.getId());}
  public RentalBooking get(String email,String id){RentalBooking b=bookings.findById(id).orElseThrow(()->new IllegalArgumentException("Rental booking not found"));User u=user(email);boolean allowed=Objects.equals(b.getCustomerId(),u.getId())||u.getRoles().contains(User.Role.ADMIN);if(!allowed){Vendor v=vendors.findByUserId(u.getId()).orElse(null);Driver d=drivers.findByUserId(u.getId()).orElse(null);allowed=(v!=null&&Objects.equals(b.getVendorId(),v.getId()))||(d!=null&&Objects.equals(b.getDriverId(),d.getId()));}if(!allowed)throw new IllegalArgumentException("You cannot view this rental booking");return b;}
 
