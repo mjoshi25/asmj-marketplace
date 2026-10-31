@@ -34,7 +34,13 @@ public class RentalService {
   RentalRoute route=route(q.fromLocationId(),q.toLocationId());
   validateJourney(route,journey);
   String vehicleType=required(q.vehicleType(),"Vehicle type is required");
-  if(q.vehicleId()!=null&&!q.vehicleId().isBlank()){Vehicle selected=vehicles.findById(q.vehicleId()).filter(v->v.getStatus()==Vehicle.Status.AVAILABLE).orElseThrow(()->new IllegalArgumentException("Selected vehicle is no longer available"));if(!selected.getVehicleType().equalsIgnoreCase(vehicleType))throw new IllegalArgumentException("Selected vehicle type does not match the quote");validateVehicleForRoute(selected,route);vehicleType=selected.getVehicleType();}
+  if(q.vehicleId()!=null&&!q.vehicleId().isBlank()){
+   Vehicle selected=vehicles.findById(q.vehicleId()).orElseThrow(()->new IllegalArgumentException("Selected vehicle was not found"));
+   if(!selected.getVehicleType().equalsIgnoreCase(vehicleType))throw new IllegalArgumentException("Selected vehicle type does not match the quote");
+   validateVehicleForRoute(selected,route);
+   if(q.travelDate()!=null)ensureAvailable(selected,null,q.travelDate(),q.travelDate(),null);
+   vehicleType=selected.getVehicleType();
+  }
   double km=q.estimatedKm()!=null&&q.estimatedKm()>0?q.estimatedKm():route.getEstimatedKm(); if(journey==RentalBooking.JourneyType.ROUND_TRIP) km*=2;
   FareRule rule=findFare(route.getId(),vehicleType,journey);
   RentalBooking.FareBreakdown b=calculate(rule,km,q.travelDate(),q.pickupTime(),0,0,0,q.discountCode(),vehicleType,route.getId(),journey.name());
@@ -47,9 +53,10 @@ public class RentalService {
   if(r.travelDate()==null||r.pickupTime()==null) throw new IllegalArgumentException("Travel date and pickup time are required");
   if(journey==RentalBooking.JourneyType.ROUND_TRIP && (r.returnDate()==null||r.returnTime()==null)) throw new IllegalArgumentException("Return date and time are required for a round trip");
   int pax=r.passengerCount()==null?1:r.passengerCount(); if(pax<1)throw new IllegalArgumentException("Passenger count must be at least 1");
-  Vehicle vehicle=resolveVehicle(r.vehicleId(),r.vehicleType(),pax); Vendor vendor=vendorForVehicle(vehicle); validateVehicleForRoute(vehicle,route); Driver driver=null;
+  LocalDate rentalEnd=r.returnDate()!=null?r.returnDate():r.travelDate();
+  Vehicle vehicle=resolveVehicle(r.vehicleId(),r.vehicleType(),pax,r.travelDate(),rentalEnd); Vendor vendor=vendorForVehicle(vehicle); validateVehicleForRoute(vehicle,route); Driver driver=null;
   if(r.driverId()!=null&&!r.driverId().isBlank()) driver=drivers.findById(r.driverId()).orElseThrow(()->new IllegalArgumentException("Driver not found"));
-  if(driver!=null){if(!Objects.equals(driver.getVendorId(),vendor.getId()))throw new IllegalArgumentException("Driver does not belong to this vendor");validateDriver(driver);}
+  if(driver!=null){if(!Objects.equals(driver.getVendorId(),vendor.getId()))throw new IllegalArgumentException("Driver does not belong to this vendor");validateDriver(driver);ensureDriverAvailable(driver,r.travelDate(),rentalEnd,null);}
   FareRule fr=findFare(route.getId(),vehicle.getVehicleType(),journey);
   double km=route.getEstimatedKm()*(journey==RentalBooking.JourneyType.ROUND_TRIP?2:1);
   RentalBooking.FareBreakdown breakdown=calculate(fr,km,r.travelDate(),r.pickupTime(),0,0,0,r.discountCode(),vehicle.getVehicleType(),route.getId(),journey.name());
@@ -77,7 +84,7 @@ public class RentalService {
 
  public RentalBooking vendorStatus(String email,String id,RentalDtos.StatusRequest r){User u=user(email);Vendor v=vendor(email);RentalBooking b=owned(id,v.getId());RentalBooking.Status next=parseStatus(r.status());if(!allowedVendor(b.getStatus(),next))throw new IllegalArgumentException("Invalid rental status transition");change(b,next,u,r.note());if(next==RentalBooking.Status.VENDOR_CONFIRMED&&b.getDriverId()!=null)notifyDriver(b,"Booking confirmed");if(next==RentalBooking.Status.REJECTED||next==RentalBooking.Status.CANCELLED)releaseVehicle(b);audit("BOOKING",id,"STATUS",u,b.getStatus().name(),next.name(),r.note());return bookings.save(b);}
 
- public RentalBooking assign(String email,String id,String vehicleId,String driverId){User u=user(email);expireOverdueUnstartedBookings(u);Vendor v=vendor(email);RentalBooking b=owned(id,v.getId());Vehicle vehicle=vehicles.findById(vehicleId).orElseThrow(()->new IllegalArgumentException("Vehicle not found"));if(!Objects.equals(vehicle.getVendorId(),v.getId()))throw new IllegalArgumentException("Vehicle does not belong to vendor");validateVehicleForRoute(vehicle,routes.findById(b.getRouteId()).orElseThrow());Driver driver=drivers.findById(driverId).orElseThrow(()->new IllegalArgumentException("Driver not found"));if(!Objects.equals(driver.getVendorId(),v.getId()))throw new IllegalArgumentException("Driver does not belong to vendor");validateDriver(driver);ensureAvailable(vehicle,driver);b.setVehicleId(vehicle.getId());b.setDriverId(driver.getId());change(b,RentalBooking.Status.DRIVER_ASSIGNED,u,"Vehicle and driver assigned");vehicle.setStatus(Vehicle.Status.BOOKED);vehicles.save(vehicle);notifyUsers(driverUser(driver),"Trip assigned","Booking "+b.getBookingNumber()+" has been assigned to you.","RENTAL_DRIVER");notifyUsers(b.getCustomerId(),"Driver assigned","A driver and vehicle have been assigned to booking "+b.getBookingNumber()+".","RENTAL_BOOKING");audit("BOOKING",id,"ASSIGN",u,"","DRIVER_ASSIGNED",vehicle.getRegistrationNumber());return bookings.save(b);}
+ public RentalBooking assign(String email,String id,String vehicleId,String driverId){User u=user(email);expireOverdueUnstartedBookings(u);Vendor v=vendor(email);RentalBooking b=owned(id,v.getId());Vehicle vehicle=vehicles.findById(vehicleId).orElseThrow(()->new IllegalArgumentException("Vehicle not found"));if(!Objects.equals(vehicle.getVendorId(),v.getId()))throw new IllegalArgumentException("Vehicle does not belong to vendor");validateVehicleForRoute(vehicle,routes.findById(b.getRouteId()).orElseThrow());Driver driver=drivers.findById(driverId).orElseThrow(()->new IllegalArgumentException("Driver not found"));if(!Objects.equals(driver.getVendorId(),v.getId()))throw new IllegalArgumentException("Driver does not belong to vendor");validateDriver(driver);LocalDate rentalEnd=b.getReturnDate()!=null?b.getReturnDate():b.getTravelDate();ensureAvailable(vehicle,driver,b.getTravelDate(),rentalEnd,b.getId());b.setVehicleId(vehicle.getId());b.setDriverId(driver.getId());change(b,RentalBooking.Status.DRIVER_ASSIGNED,u,"Vehicle and driver assigned");vehicle.setStatus(Vehicle.Status.BOOKED);vehicles.save(vehicle);notifyUsers(driverUser(driver),"Trip assigned","Booking "+b.getBookingNumber()+" has been assigned to you.","RENTAL_DRIVER");notifyUsers(b.getCustomerId(),"Driver assigned","A driver and vehicle have been assigned to booking "+b.getBookingNumber()+".","RENTAL_BOOKING");audit("BOOKING",id,"ASSIGN",u,"","DRIVER_ASSIGNED",vehicle.getRegistrationNumber());return bookings.save(b);}
 
  public RentalBooking start(String email,String id,RentalDtos.KmRequest r){User u=user(email);Driver d=driver(email);RentalBooking b=driverOwned(id,d.getId());if(b.getStatus()!=RentalBooking.Status.DRIVER_ASSIGNED&&b.getStatus()!=RentalBooking.Status.CUSTOMER_CONFIRMED&&b.getStatus()!=RentalBooking.Status.DRIVER_EN_ROUTE)throw new IllegalArgumentException("Journey cannot be started from "+b.getStatus());if(r.km()<0)throw new IllegalArgumentException("Starting KM cannot be negative");Vehicle v=vehicles.findById(b.getVehicleId()).orElseThrow();if(r.km()+0.001<v.getCurrentKm())throw new IllegalArgumentException("Starting KM cannot be less than the vehicle's current KM");validateTripTime(b,r.km(),null);b.setStartKm(r.km());b.setStartAt(Instant.now());b.setStartLat(r.lat());b.setStartLng(r.lng());change(b,RentalBooking.Status.JOURNEY_STARTED,u,"Journey started at KM "+r.km());v.setStatus(Vehicle.Status.ON_TRIP);v.setCurrentKm(r.km());vehicles.save(v);notifyUsers(b.getCustomerId(),"Journey started","Driver has started booking "+b.getBookingNumber()+" at KM "+r.km()+".","RENTAL_TRIP");audit("BOOKING",id,"START",u,"","JOURNEY_STARTED","Start KM "+r.km());return bookings.save(b);}
 
@@ -152,8 +159,45 @@ public class RentalService {
   if(bookings.existsByVehicleIdAndStatusIn(vehicleId,activeStatuses()))return;
   vehicles.findById(vehicleId).ifPresent(v->{if(v.getStatus()==Vehicle.Status.BOOKED){v.setStatus(Vehicle.Status.AVAILABLE);vehicles.save(v);}});
  }
- private Vehicle resolveVehicle(String id,String type,int pax){Vehicle v;if(id!=null&&!id.isBlank())v=vehicles.findById(id).orElseThrow(()->new IllegalArgumentException("Vehicle not found"));else{v=vehicles.findByStatusAndVehicleType(Vehicle.Status.AVAILABLE,required(type,"Vehicle type is required")).stream().findFirst().orElseThrow(()->new IllegalArgumentException("No available vehicle of this type"));}if(v.getSeats()!=null&&v.getSeats()<pax)throw new IllegalArgumentException("Selected vehicle cannot accommodate all passengers");ensureAvailable(v,null);return v;}
- private void ensureAvailable(Vehicle v,Driver d){if(v.getStatus()!=Vehicle.Status.AVAILABLE)throw new IllegalArgumentException("Vehicle is not available");if(bookings.existsByVehicleIdAndStatusIn(v.getId(),activeStatuses()))throw new IllegalArgumentException("Vehicle already has an active booking");if(d!=null&&bookings.existsByDriverIdAndStatusIn(d.getId(),activeStatuses()))throw new IllegalArgumentException("Driver already has an active booking");}
+ private Vehicle resolveVehicle(String id,String type,int pax,LocalDate start,LocalDate end){
+  Vehicle v;
+  if(id!=null&&!id.isBlank())v=vehicles.findById(id).orElseThrow(()->new IllegalArgumentException("Vehicle not found"));
+  else v=vehicles.findByVehicleTypeIgnoreCaseAndStatusIn(required(type,"Vehicle type is required"),EnumSet.of(Vehicle.Status.AVAILABLE,Vehicle.Status.BOOKED)).stream()
+    .filter(candidate->candidate.getSeats()==null||candidate.getSeats()>=pax)
+    .filter(candidate->isVehicleAvailableForPeriod(candidate,start,end,null)).findFirst()
+    .orElseThrow(()->new IllegalArgumentException("No vehicle is available for the selected rental dates"));
+  if(v.getSeats()!=null&&v.getSeats()<pax)throw new IllegalArgumentException("Selected vehicle cannot accommodate all passengers");
+  ensureAvailable(v,null,start,end,null);return v;
+ }
+ private void ensureAvailable(Vehicle v,Driver d,LocalDate start,LocalDate end,String excludeBookingId){
+  if(v.getStatus()==Vehicle.Status.MAINTENANCE||v.getStatus()==Vehicle.Status.INACTIVE||v.getStatus()==Vehicle.Status.ON_TRIP)throw new IllegalArgumentException("Vehicle is not operational/available");
+  if(!isVehicleAvailableForPeriod(v,start,end,excludeBookingId))throw new IllegalArgumentException("Vehicle already has a booking that overlaps the selected rental dates");
+  if(d!=null)ensureDriverAvailable(d,start,end,excludeBookingId);
+ }
+ private boolean isVehicleAvailableForPeriod(Vehicle v,LocalDate start,LocalDate end,String excludeBookingId){
+  if(start==null)return v.getStatus()==Vehicle.Status.AVAILABLE;
+  LocalDate requestedEnd=end==null?start:end;
+  for(RentalBooking existing:bookings.findByVehicleId(v.getId())){
+   if(Objects.equals(existing.getId(),excludeBookingId)||existing.getStatus()==null||!activeStatuses().contains(existing.getStatus()))continue;
+   if(isJourneyInProgress(existing.getStatus()))return false;
+   LocalDate existingStart=existing.getTravelDate();
+   LocalDate existingEnd=existing.getReturnDate()!=null?existing.getReturnDate():existingStart;
+   if(existingStart!=null&&existingEnd!=null&&!requestedEnd.isBefore(existingStart)&&!existingEnd.isBefore(start))return false;
+  }
+  return true;
+ }
+ private void ensureDriverAvailable(Driver driver,LocalDate start,LocalDate end,String excludeBookingId){
+  if(start==null)return;
+  LocalDate requestedEnd=end==null?start:end;
+  for(RentalBooking existing:bookings.findByDriverId(driver.getId())){
+   if(Objects.equals(existing.getId(),excludeBookingId)||existing.getStatus()==null||!activeStatuses().contains(existing.getStatus()))continue;
+   if(isJourneyInProgress(existing.getStatus()))throw new IllegalArgumentException("Driver is already on an active trip");
+   LocalDate existingStart=existing.getTravelDate();LocalDate existingEnd=existing.getReturnDate()!=null?existing.getReturnDate():existingStart;
+   if(existingStart!=null&&existingEnd!=null&&!requestedEnd.isBefore(existingStart)&&!existingEnd.isBefore(start))throw new IllegalArgumentException("Driver already has a booking that overlaps the selected rental dates");
+  }
+ }
+ private boolean isJourneyInProgress(RentalBooking.Status status){return EnumSet.of(RentalBooking.Status.JOURNEY_STARTED,RentalBooking.Status.JOURNEY_IN_PROGRESS,RentalBooking.Status.OUTBOUND_COMPLETED,RentalBooking.Status.RETURN_STARTED).contains(status);}
+
  private Set<RentalBooking.Status> activeStatuses(){return EnumSet.of(RentalBooking.Status.REQUESTED,RentalBooking.Status.VENDOR_CONFIRMED,RentalBooking.Status.DRIVER_ASSIGNED,RentalBooking.Status.CUSTOMER_CONFIRMED,RentalBooking.Status.DRIVER_EN_ROUTE,RentalBooking.Status.JOURNEY_STARTED,RentalBooking.Status.JOURNEY_IN_PROGRESS,RentalBooking.Status.OUTBOUND_COMPLETED,RentalBooking.Status.RETURN_STARTED);}
  private Vendor vendorForVehicle(Vehicle v){return vendors.findById(v.getVendorId()).filter(x->x.getVerificationStatus()==Vendor.VerificationStatus.APPROVED&&x.getStatus()==Vendor.Status.ACTIVE).orElseThrow(()->new IllegalArgumentException("Vehicle vendor is not approved/active"));}
  private Vendor vendor(String email){User u=user(email);return vendors.findByUserId(u.getId()).filter(v->v.getVerificationStatus()==Vendor.VerificationStatus.APPROVED&&v.getStatus()==Vendor.Status.ACTIVE).orElseThrow(()->new IllegalArgumentException("Approved vendor profile required"));}

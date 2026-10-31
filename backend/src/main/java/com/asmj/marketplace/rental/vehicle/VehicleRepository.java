@@ -4,6 +4,7 @@ import java.util.*;
 public interface VehicleRepository extends MongoRepository<Vehicle,String>{
  List<Vehicle> findByVendorIdOrderByCreatedAtDesc(String vendorId);
  List<Vehicle> findByStatusAndVehicleType(Vehicle.Status status,String vehicleType);
+ List<Vehicle> findByVehicleTypeIgnoreCaseAndStatusIn(String vehicleType,Collection<Vehicle.Status> statuses);
  List<Vehicle> findByStatusOrderByCreatedAtDesc(Vehicle.Status status);
  boolean existsByRegistrationNumberIgnoreCase(String registrationNumber);
 }

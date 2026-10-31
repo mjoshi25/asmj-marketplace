@@ -6,6 +6,7 @@ public interface RentalBookingRepository extends MongoRepository<RentalBooking,S
  List<RentalBooking> findByVendorIdOrderByCreatedAtDesc(String id);
  List<RentalBooking> findByDriverIdOrderByTravelDateAscPickupTimeAsc(String id);
  List<RentalBooking> findByVehicleId(String vehicleId);
+ List<RentalBooking> findByDriverId(String driverId);
  boolean existsByVehicleIdAndStatusIn(String vehicleId,Collection<RentalBooking.Status> statuses);
  boolean existsByDriverIdAndStatusIn(String driverId,Collection<RentalBooking.Status> statuses);
 }
