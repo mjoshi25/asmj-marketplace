@@ -15,6 +15,10 @@ public class Vehicle {
  @Indexed(unique=true) private String registrationNumber;
  @Indexed private String vehicleType;
  private String make,model;
+ @Builder.Default private List<String> imageUrls=new ArrayList<>();
+ @Builder.Default private Map<String,String> documentUrls=new LinkedHashMap<>();
+ private ApprovalStatus approvalStatus; private String approvalNote; private Instant reviewedAt; private String reviewedBy;
+ public enum ApprovalStatus{PENDING,APPROVED,REJECTED,SUSPENDED}
  private Integer year,seats;
  private String fuelType,transmission;
  private boolean ac;

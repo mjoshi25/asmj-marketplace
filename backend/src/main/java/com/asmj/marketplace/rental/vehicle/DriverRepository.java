@@ -4,4 +4,5 @@ import java.util.*;
 public interface DriverRepository extends MongoRepository<Driver,String>{
  Optional<Driver> findByUserId(String userId);
  List<Driver> findByVendorIdOrderByCreatedAtDesc(String vendorId);
+ List<Driver> findAllByOrderByCreatedAtDesc();
 }

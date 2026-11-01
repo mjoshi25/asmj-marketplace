@@ -6,5 +6,6 @@ public interface VehicleRepository extends MongoRepository<Vehicle,String>{
  List<Vehicle> findByStatusAndVehicleType(Vehicle.Status status,String vehicleType);
  List<Vehicle> findByVehicleTypeIgnoreCaseAndStatusIn(String vehicleType,Collection<Vehicle.Status> statuses);
  List<Vehicle> findByStatusOrderByCreatedAtDesc(Vehicle.Status status);
+ List<Vehicle> findAllByOrderByCreatedAtDesc();
  boolean existsByRegistrationNumberIgnoreCase(String registrationNumber);
 }

@@ -15,6 +15,10 @@ public class Driver {
  private String name,mobile,licenseNumber,licenseType;
  private LocalDate licenseExpiry;
  private String assignedVehicleId;
+ @Builder.Default private List<String> photoUrls=new ArrayList<>();
+ @Builder.Default private Map<String,String> documentUrls=new LinkedHashMap<>();
+ private ApprovalStatus approvalStatus; private String approvalNote; private Instant reviewedAt; private String reviewedBy;
+ public enum ApprovalStatus{PENDING,APPROVED,REJECTED,SUSPENDED}
  @Builder.Default private Status status=Status.ACTIVE;
  @Builder.Default private List<String> documents=new ArrayList<>();
  private Instant createdAt,updatedAt;

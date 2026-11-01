@@ -38,3 +38,9 @@ export const deleteRentalDiscount=id=>http.delete(`/rentals/admin/discounts/${id
 export const adminRentalBookings=()=>http.get("/rentals/admin/bookings");
 
 export const getConfiguredLocations=getRentalLocations;
+
+export const uploadRentalFile=(file,purpose)=>{const data=new FormData();data.append("file",file);data.append("purpose",purpose);return http.post("/uploads",data,{headers:{"Content-Type":"multipart/form-data"}})};
+export const adminRentalVehicles=()=>http.get("/rentals/admin/vehicles");
+export const reviewRentalVehicle=(id,status,note="")=>http.put(`/rentals/admin/vehicles/${id}/review`,null,{params:{status,note}});
+export const adminRentalDrivers=()=>http.get("/rentals/admin/drivers");
+export const reviewRentalDriver=(id,status,note="")=>http.put(`/rentals/admin/drivers/${id}/review`,null,{params:{status,note}});
