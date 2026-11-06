@@ -2,6 +2,8 @@ import http from "./http";
 export const getProducts=()=>http.get("/products");
 export const getVendorProducts=()=>http.get("/products/vendor");
 export const saveProduct=(p,id)=>id?http.put(`/products/vendor/${id}`,p):http.post("/products/vendor",p);
+export const deleteVendorProduct=id=>http.delete(`/products/vendor/${id}`);
+export const deleteAdminProduct=id=>http.delete(`/admin/products/${id}`);
 export const getCart=()=>http.get("/products/cart");
 export const addToCart=p=>http.post("/products/cart",p);
 export const removeFromCart=(productId,variantId)=>http.delete("/products/cart",{params:{productId,variantId}});
