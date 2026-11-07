@@ -1,34 +1,30 @@
-import {Link,useNavigate,useLocation} from "react-router-dom";
-import {LogOut,LayoutDashboard,PlusCircle,ShieldCheck,UserRound,Menu,X,ChevronDown} from "lucide-react";
-import {useState} from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { LogOut, LayoutDashboard, PlusCircle, ShieldCheck, UserRound, Menu, X, ChevronDown } from "lucide-react";
+import { useState } from "react";
 import Logo from "./Logo";
-import {useAuth} from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar(){
  const {user,logout}=useAuth(); const nav=useNavigate(); const location=useLocation(); const [open,setOpen]=useState(false);
- const roles=user?.roles||[]; const admin=roles.includes("ADMIN"),vendor=roles.includes("VENDOR"),driver=roles.includes("DRIVER");
- const home=admin?"/admin":driver?"/driver":vendor?"/vendor":"/dashboard";
- const links=admin?[["/admin","Dashboard"],["/admin/products","Products"],["/admin/users","Users"],["/admin/vendors","Vendors"],["/admin/approvals","Approvals"],["/admin/printouts","Printout approvals"],["/admin/categories","Categories"],["/admin/analytics","Analytics"],["/admin/rentals","Rental control"],["/admin/events","Events"],["/admin/insurance","Insurance"],["/admin/payments","Payments"]]
-   :driver?[["/driver","Trips"]]
-  :vendor?[["/vendor","Dashboard"],["/vendor/products","Products"],["/vendor/listings","Listings"],["/vendor/requests","Bookings & requests"],["/vendor/job-applications","Job applications"],["/vendor/enquiries","Enquiries"],["/vendor/messages","Messages"],["/vendor/analytics","Analytics"],["/vendor/rentals","Rental fleet"],["/vendor/rentals/bookings","Rental bookings"],["/vendor/printouts","Printout requests"],["/vendor/printouts/pricing","Printout pricing"],["/vendor/events","Events"],["/vendor/insurance","Insurance"],["/payments","Payments"]]
-  :[["/discover","Discover"],["/applications","My job applications"],["/products","Shop products"],["/products/orders","My orders"],["/rentals/book","Book rental"],["/rentals/bookings","My rentals"],["/printouts","Printout services"],["/printouts/requests","My printout requests"],["/events","Events"],["/events/registrations","My events"],["/insurance","Insurance"],["/insurance/quotes","My quotes"],["/payments","Payments"],["/payments/upload","Upload payment"],["/favorites","Favorites"],["/enquiries","Enquiries"],["/messages","Messages"],["/notifications","Notifications"]];
- const visibleLinks=links.slice(0,5),moreLinks=links.slice(5); const close=()=>setOpen(false); const signout=()=>{logout();nav("/");close()};
- return <>
- <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
+ const roles=Array.isArray(user?.roles)?user.roles:(user?.role?[user.role]:[]);
+ const admin=roles.includes("ADMIN"),vendor=roles.includes("VENDOR"),driver=roles.includes("DRIVER"),customer=roles.includes("USER");
+ const home=driver&&!admin&&!vendor&&!customer?"/driver":"/dashboard";
+ const customerLinks=[["/discover","Discover"],["/applications","My job applications"],["/products","Shop products"],["/products/orders","My orders"],["/products/cart","My cart"],["/rentals/book","Book rental"],["/rentals/bookings","My rentals"],["/printouts","Printout services"],["/printouts/requests","My printout requests"],["/events","Events"],["/events/registrations","My events"],["/insurance","Insurance"],["/insurance/quotes","My quotes"],["/payments","Payments"],["/payments/upload","Upload payment"],["/favorites","Favorites"],["/enquiries","Enquiries"],["/messages","Messages"],["/notifications","Notifications"],["/profile","Profile"]];
+ const vendorLinks=[["/vendor","Vendor dashboard"],["/vendor/products","Products & inventory"],["/vendor/listings","My listings"],["/vendor/requests","Bookings & requests"],["/vendor/job-applications","Job applications"],["/vendor/enquiries","Enquiries"],["/vendor/messages","Messages"],["/vendor/analytics","Analytics"],["/vendor/rentals","Rental fleet"],["/vendor/rentals/bookings","Rental bookings"],["/vendor/printouts","Printout requests"],["/vendor/printouts/pricing","Printout pricing"],["/vendor/events","Events management"],["/vendor/insurance","Insurance management"],["/payments","Payments"]];
+ const adminLinks=[["/admin","Admin dashboard"],["/admin/products","Product administration"],["/admin/users","Users"],["/admin/vendors","Vendors"],["/admin/approvals","Approvals"],["/admin/printouts","Printout approvals"],["/admin/categories","Categories"],["/admin/analytics","Analytics"],["/admin/rentals","Rental control"],["/admin/events","Events"],["/admin/insurance","Insurance"],["/admin/payments","Payments"],["/admin/bookings","Bookings"],["/admin/listings","Listings"],["/admin/revenue","Revenue"],["/admin/local-promotions","Local promotions"],["/admin/audit-logs","Audit logs"]];
+ const sections=[];
+ if(customer) sections.push({title:"Marketplace & My Activities",links:customerLinks});
+ if(vendor) sections.push({title:"Vendor Workspace",links:vendorLinks});
+ if(admin) sections.push({title:"Administration",links:adminLinks});
+ if(driver) sections.push({title:"Driver Workspace",links:[["/driver","Trips"]]});
+ const seen=new Set(); const allLinks=sections.flatMap(s=>s.links).filter(([href])=>{if(seen.has(href))return false;seen.add(href);return true;});
+ const close=()=>setOpen(false); const signout=()=>{logout();nav("/");close()};
+ return <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
   <div className="mx-auto flex min-h-[72px] w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
    <Link to={home} onClick={close} className="shrink-0"><Logo/></Link>
-   {user&&<nav className="hidden items-center gap-1 lg:flex">{visibleLinks.map(([h,t])=><Link key={h} className={`navlink ${location.pathname===h||location.pathname.startsWith(h+"/")?"navlink-active":""}`} to={h}>{t}</Link>)}{moreLinks.length>0&&<details className="relative"><summary className="navlink list-none cursor-pointer">More <ChevronDown size={14}/></summary><div className="absolute right-0 top-11 z-50 grid min-w-56 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">{moreLinks.map(([h,t])=><Link key={h} className="navlink" onClick={close} to={h}>{t}</Link>)}</div></details>}</nav>}
-   <div className="flex items-center gap-2">
-    {user&&<Link className="btn-secondary hidden sm:inline-flex" to={home}><LayoutDashboard size={16}/> <span>Dashboard</span></Link>}
-    {vendor&&!admin&&<><Link className="btn-primary hidden sm:inline-flex" to="/vendor/listings/new"><PlusCircle size={16}/> Post</Link></>}
-    {user&&<Link className="icon-btn profile-avatar" to="/profile" title="Profile" aria-label="Profile">
-      {user.profileImage ? <img src={`${user.profileImage}${user.profileImage.includes("?") ? "&" : "?"}nav=${user.updatedAt || "1"}`} alt="Profile" className="profile-avatar-image" onError={(e)=>{e.currentTarget.style.display="none";}}/> : <UserRound size={17}/>} 
-    </Link>}
-    {admin&&<Link className="icon-btn hidden sm:inline-flex" to="/admin/audit-logs" title="Audit logs"><ShieldCheck size={17}/></Link>}
-    {user&&<button className="btn-secondary hidden sm:inline-flex" onClick={signout}><LogOut size={16}/> Logout</button>}
-    {user&&<button className="icon-btn xl:hidden" onClick={()=>setOpen(!open)} aria-label="Menu">{open?<X size={19}/>:<Menu size={19}/>}</button>}
-   </div>
+   {user&&<nav className="hidden items-center gap-1 lg:flex">{allLinks.slice(0,5).map(([h,t])=><Link key={h} className={`navlink ${location.pathname===h||location.pathname.startsWith(h+"/")?"navlink-active":""}`} to={h}>{t}</Link>)}{allLinks.length>5&&<details className="relative"><summary className="navlink list-none cursor-pointer">All workspaces <ChevronDown size={14}/></summary><div className="absolute right-0 top-11 z-50 max-h-[75vh] min-w-64 overflow-auto rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">{sections.map(section=><div key={section.title} className="mb-3 last:mb-0"><p className="px-2 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">{section.title}</p>{section.links.map(([h,t])=><Link key={h} className="block rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50" onClick={close} to={h}>{t}</Link>)}</div>)}</div></details>}</nav>}
+   <div className="flex items-center gap-2">{user&&<Link className="btn-secondary hidden sm:inline-flex" to={home}><LayoutDashboard size={16}/> <span>Marketplace home</span></Link>}{vendor&&!admin&&<Link className="btn-primary hidden sm:inline-flex" to="/vendor/listings/new"><PlusCircle size={16}/> Post</Link>}{user&&<Link className="icon-btn profile-avatar" to="/profile" title="Profile" aria-label="Profile">{user.profileImage?<img src={`${user.profileImage}${user.profileImage.includes("?")?"&":"?"}nav=${user.updatedAt||"1"}`} alt="Profile" className="profile-avatar-image" onError={e=>{e.currentTarget.style.display="none";}}/>:<UserRound size={17}/>}</Link>}{admin&&<Link className="icon-btn hidden sm:inline-flex" to="/admin/audit-logs" title="Audit logs"><ShieldCheck size={17}/></Link>}{user&&<button className="btn-secondary hidden sm:inline-flex" onClick={signout}><LogOut size={16}/> Logout</button>}{user&&<button className="icon-btn xl:hidden" onClick={()=>setOpen(!open)} aria-label="Menu">{open?<X size={19}/>:<Menu size={19}/>}</button>}</div>
   </div>
-  {user&&open&&<div className="border-t border-slate-100 bg-white px-4 py-4 shadow-lg xl:hidden"><nav className="mx-auto grid w-full max-w-7xl gap-1 sm:grid-cols-2">{links.map(([h,t])=><Link key={h} onClick={close} className="mobile-navlink" to={h}>{t}</Link>)}<Link onClick={close} className="mobile-navlink" to="/profile">Profile & Settings</Link>{vendor&&!admin&&<Link onClick={close} className="mobile-navlink font-bold" to="/vendor/listings/new">+ Create listing</Link>}<button onClick={signout} className="mobile-navlink text-left text-red-600">Sign out</button></nav></div>}
- </header></>
+  {user&&open&&<div className="border-t border-slate-100 bg-white px-4 py-4 shadow-lg xl:hidden"><nav className="mx-auto grid w-full max-w-7xl gap-1 sm:grid-cols-2">{sections.map(section=><div key={section.title} className="sm:col-span-2"><p className="px-2 pb-1 pt-3 text-xs font-bold uppercase tracking-wider text-slate-400">{section.title}</p><div className="grid gap-1 sm:grid-cols-2">{section.links.map(([h,t])=><Link key={h} onClick={close} className="mobile-navlink" to={h}>{t}</Link>)}</div></div>)}<Link onClick={close} className="mobile-navlink" to="/profile">Profile & Settings</Link>{vendor&&<Link onClick={close} className="mobile-navlink font-bold" to="/vendor/listings/new">+ Create listing</Link>}<button onClick={signout} className="mobile-navlink text-left text-red-600">Sign out</button></nav></div>}
+ </header>;
 }
